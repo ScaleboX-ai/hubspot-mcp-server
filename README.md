@@ -17,8 +17,8 @@
 4. Сохраните приложение. Скопируйте **Client ID** и **Client Secret**.
 5. Скопируйте файл `.env.example` в этой папке, переименуйте его в `.env` и вставьте туда скопированные ключи:
    ```env
-   HUBSPOT_CLIENT_ID=d15a5972-d9d4-42ee-8943-9058b2a02042
-   HUBSPOT_CLIENT_SECRET=eed451de-76dd-4667-a747-cda00064995e
+   HUBSPOT_CLIENT_ID=ваш_client_id_из_hubspot
+   HUBSPOT_CLIENT_SECRET=ваш_client_secret_из_hubspot
    ```
 6. Убедитесь, что папка `build` скомпилирована (вы запустили `npm run build` перед отправкой).
 7. Заархивируйте папку в ZIP-архив (можно без папки `node_modules` — скрипты установки сами всё скачают!) и отправьте сейлзам.
