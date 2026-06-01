@@ -6,24 +6,24 @@
 
 ## English Version
 
-This server allows your managers and sales representatives to securely connect **HubSpot CRM** to their **Cursor, Windsurf IDE, VS Code (Cline extension), or Claude Desktop** applications using natural language. They can search contacts, view deal details, and create or update deals through their local AI assistants.
+This Model Context Protocol (MCP) server enables secure, natural language interaction with your **HubSpot CRM** data through local AI assistants. Users can query, create, or update CRM records (such as contacts, companies, and deals) directly using their preferred AI environments, including **Cursor, Windsurf IDE, VS Code (Cline extension), or Claude Desktop**.
 
-We designed this setup to be **completely frictionless and cross-platform**. Non-technical users do **not** need to install dependencies manually, edit complex JSON files, or write console commands. The installer does all the heavy lifting automatically!
+Designed to be **completely frictionless and cross-platform**, this setup eliminates the need for manual dependency installations, configuration file editing, or console command executions. The automated Setup Wizard handles the entire configuration process seamlessly.
 
-### 💻 Onboarding Guide for Team Members (2 Easy Steps!)
+### 💻 User Setup Guide (2 Easy Steps!)
 
 #### Step 1. Unzip the Project Archive
-1. Download the archive containing the server folder and extract it to any directory on your computer (e.g., `C:\hubspot-mcp-server\` on Windows or your Home folder on a Mac).
+1. Download the archive containing the server folder and extract it to any directory on your computer (e.g., `C:\hubspot-mcp-server\` on Windows or your Home folder on macOS).
 
 #### Step 2. Run the Setup Wizard
 
 *   **🖥️ On Windows:**
     1. Double-click the **`setup.bat`** file inside the folder.
-    2. A console window will pop up briefly, check for Node.js (installing it silently in the background if it's missing), and automatically launch the **Setup Wizard in your web browser**.
+    2. A console window will pop up briefly to verify Node.js (installing it silently in the background if missing) and automatically launch the **Setup Wizard in your web browser**.
     3. In the browser setup form, paste the **Client ID** and **Client Secret** provided by your administrator.
     4. Click **"Save & Continue"**. This automatically registers the server globally in Claude Desktop, Cursor, Windsurf, and VS Code (Cline).
-    5. You will be redirected to the HubSpot login page. Sign in under your **personal HubSpot user credentials** and click the orange **"Authorize" (Connect app)** button.
-    6. Once you see the **"Setup Complete!"** success screen with a green checkmark showing which apps were configured, you can close the browser tab.
+    5. You will be redirected to the HubSpot login page. Sign in under your **personal HubSpot credentials** and click the orange **"Authorize" (Connect app)** button.
+    6. Once you see the **"Setup Complete!"** success screen displaying the configured applications, you can close the browser tab.
 
 *   **🍎 On macOS (Mac):**
     1. Open your **Terminal** application.
@@ -34,7 +34,7 @@ We designed this setup to be **completely frictionless and cross-platform**. Non
     3. The script will verify Node.js (installing it via Homebrew if needed) and launch the **Setup Wizard in your web browser**.
     4. Paste the **Client ID** and **Client Secret** provided by your administrator and click **"Save & Continue"**.
     5. Log in under your **personal HubSpot account** in the browser redirect and click **"Authorize"**.
-    6. Once you see the **"Setup Complete!"** success page, you are done!
+    6. Once you see the **"Setup Complete!"** success page, the installation is finished!
 
 #### Step 3. Restart and Chat!
 
@@ -52,20 +52,20 @@ We designed this setup to be **completely frictionless and cross-platform**. Non
 
 ## Русская версия
 
-Этот сервер позволяет вашим менеджерам по продажам (сейлзам) подключаться к **HubSpot** прямо через **Cursor, Windsurf IDE, VS Code (расширение Cline) или Claude Desktop** с помощью искусственного интеллекта. Они смогут искать контакты, смотреть детали, создавать и обновлять сделки простым человеческим языком.
+Этот сервер протокола контекста моделей (Model Context Protocol - MCP) обеспечивает безопасное взаимодействие с вашими данными **HubSpot CRM** на естественном языке. Пользователи могут выполнять поиск, чтение, создание и обновление записей CRM (контактов, компаний, сделок) напрямую через локальных ИИ-ассистентов в таких средах, как **Cursor, Windsurf IDE, VS Code (расширение Cline) или Claude Desktop**.
 
-Мы сделали этот продукт **абсолютно кроссплатформенным** и полностью автоматическим. Сейлзам больше **не нужно писать сложные команды, вручную настраивать JSON-файлы или искать скрытые папки**. Скрипт сделает всё за них!
+Созданный как **полностью кроссплатформенное** и бесшовное решение, данный сервер исключает необходимость ручной установки зависимостей, редактирования конфигурационных файлов или выполнения консольных команд. Автоматический мастер настройки (Setup Wizard) выполняет всю конфигурацию самостоятельно.
 
-### 💻 Инструкция для менеджеров (Всего 2 шага!)
+### 💻 Руководство пользователя по установке (Всего 2 шага!)
 
 #### Шаг 1. Распакуйте архив
 Скачайте архив с программой и распакуйте его в любую удобную папку на компьютере (например, `C:\hubspot-mcp-server\` на Windows или в домашнюю папку на Mac).
 
-#### Шаг 2. Запустите авто-настройку
+#### Step 2. Запустите авто-настройку
 
 *   **🖥️ На Windows:**
     1. Найдите файл **`setup.bat`** внутри папки и запустите его двойным щелчком мыши.
-    2. Скрипт сам проверит Node.js (если его нет — установит в фоновом режиме), **автоматически найдет и настроит Claude Desktop, Cursor, Windsurf и VS Code (Cline)**, после чего откроет мастер настройки в браузере.
+    2. Скрипт сам проверит наличие Node.js (установит в фоновом режиме в случае отсутствия), **автоматически найдет и настроит Claude Desktop, Cursor, Windsurf и VS Code (Cline)**, после чего откроет мастер настройки в браузере.
     3. Вставьте **Client ID** и **Client Secret**, полученные от администратора.
     4. Нажмите **«Save & Continue»**.
     5. Войдите под своим **личным аккаунтом HubSpot** и нажмите кнопку **«Подключить приложение»** (Authorize).
@@ -77,7 +77,7 @@ We designed this setup to be **completely frictionless and cross-platform**. Non
        ```bash
        bash setup.sh
        ```
-    3. Скрипт проверит наличие Node.js (если его нет — установит), **автоматически настроит все найденные программы** и откроет мастер настройки в браузере.
+    3. Скрипт проверит наличие Node.js (при необходимости выполнит установку), **автоматически настроит все поддерживаемые программы** и откроет мастер настройки в браузере.
     4. Вставьте **Client ID** и **Client Secret**, полученные от администратора, и нажмите **«Save & Continue»**.
     5. Войдите под своим **личным аккаунтом HubSpot** и нажмите кнопку **«Подключить приложение»** (Authorize).
     6. Готово!
@@ -101,8 +101,8 @@ We designed this setup to be **completely frictionless and cross-platform**. Non
 3. Set the Redirect URL to:
    * *Укажите Redirect URL:*
      `http://localhost:6274/oauth/callback/debug`
-4. Copy the **Client ID** and **Client Secret**. Give these to your sales reps!
-   * *Скопируйте Client ID и Client Secret и передайте их сотрудникам.*
+4. Copy the **Client ID** and **Client Secret**. Provide these to your users!
+   * *Скопируйте Client ID и Client Secret и передайте их пользователям.*
 
 ### 2. Compile Server / Сборка сервера
 Before packing the folder into a ZIP archive for your team, make sure to compile the TypeScript code:
