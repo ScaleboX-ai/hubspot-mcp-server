@@ -68,85 +68,85 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
     tools: [
       {
         name: 'hubspot_search_deals',
-        description: 'Поиск сделок в HubSpot по текстовому запросу, этапу сделки (dealstage) или минимальной сумме.',
+        description: 'Search for deals in HubSpot by text query, dealstage, or minimum amount.',
         inputSchema: {
           type: 'object',
           properties: {
-            query: { type: 'string', description: 'Текстовый запрос для поиска по названию сделки' },
-            dealstage: { type: 'string', description: 'Этап сделки (например, appointmentscheduled, closedwon, closedlost)' },
-            minAmount: { type: 'number', description: 'Минимальная сумма сделки' },
-            limit: { type: 'number', description: 'Максимальное количество результатов (по умолчанию 10)' },
+            query: { type: 'string', description: 'Text query to search by deal name' },
+            dealstage: { type: 'string', description: 'Deal stage (e.g. appointmentscheduled, closedwon, closedlost)' },
+            minAmount: { type: 'number', description: 'Minimum deal amount' },
+            limit: { type: 'number', description: 'Maximum number of results to return (default 10)' },
           },
         },
       },
       {
         name: 'hubspot_get_deal',
-        description: 'Получить полную информацию о конкретной сделке в HubSpot по её ID.',
+        description: 'Get full details of a specific HubSpot deal by ID.',
         inputSchema: {
           type: 'object',
           properties: {
-            dealId: { type: 'string', description: 'Уникальный ID сделки в HubSpot' },
+            dealId: { type: 'string', description: 'Unique HubSpot Deal ID' },
           },
           required: ['dealId'],
         },
       },
       {
         name: 'hubspot_create_deal',
-        description: 'Создать новую сделку в HubSpot.',
+        description: 'Create a new deal in HubSpot.',
         inputSchema: {
           type: 'object',
           properties: {
-            dealname: { type: 'string', description: 'Название сделки' },
-            dealstage: { type: 'string', description: 'Этап сделки (например, appointmentscheduled, qualifiedtobuy, presentationscheduled, decisionmakerboughtin, contractsent, closedwon, closedlost)' },
-            amount: { type: 'number', description: 'Сумма сделки' },
-            closedate: { type: 'string', description: 'Ожидаемая дата закрытия сделки (в формате YYYY-MM-DD или ISO)' },
-            hubspot_owner_id: { type: 'string', description: 'ID владельца (пользователя HubSpot), ответственного за сделку' },
+            dealname: { type: 'string', description: 'Deal Name' },
+            dealstage: { type: 'string', description: 'Deal stage (e.g. appointmentscheduled, qualifiedtobuy, presentationscheduled, decisionmakerboughtin, contractsent, closedwon, closedlost)' },
+            amount: { type: 'number', description: 'Deal Amount' },
+            closedate: { type: 'string', description: 'Expected Close Date (format YYYY-MM-DD or ISO)' },
+            hubspot_owner_id: { type: 'string', description: 'Owner ID (HubSpot User ID) responsible for the deal' },
           },
           required: ['dealname', 'dealstage'],
         },
       },
       {
         name: 'hubspot_update_deal',
-        description: 'Обновить параметры существующей сделки в HubSpot.',
+        description: 'Update properties of an existing HubSpot deal.',
         inputSchema: {
           type: 'object',
           properties: {
-            dealId: { type: 'string', description: 'ID обновляемой сделки' },
-            dealname: { type: 'string', description: 'Новое название сделки (опционально)' },
-            dealstage: { type: 'string', description: 'Новый этап сделки (опционально)' },
-            amount: { type: 'number', description: 'Новая сумма сделки (опционально)' },
-            closedate: { type: 'string', description: 'Новая дата закрытия (опционально)' },
-            hubspot_owner_id: { type: 'string', description: 'Новый ID ответственного (опционально)' },
+            dealId: { type: 'string', description: 'ID of the deal to update' },
+            dealname: { type: 'string', description: 'New deal name (optional)' },
+            dealstage: { type: 'string', description: 'New deal stage (optional)' },
+            amount: { type: 'number', description: 'New deal amount (optional)' },
+            closedate: { type: 'string', description: 'New close date (optional)' },
+            hubspot_owner_id: { type: 'string', description: 'New owner ID (optional)' },
           },
           required: ['dealId'],
         },
       },
       {
         name: 'hubspot_search_contacts',
-        description: 'Поиск контактов (клиентов) в HubSpot по имени, фамилии, компании или email.',
+        description: 'Search for contacts in HubSpot by name, email, phone, or company.',
         inputSchema: {
           type: 'object',
           properties: {
-            query: { type: 'string', description: 'Текстовый запрос для поиска по имени, фамилии или телефону' },
-            email: { type: 'string', description: 'Поиск строго по email адресу' },
-            limit: { type: 'number', description: 'Максимальное количество результатов' },
+            query: { type: 'string', description: 'Text query to search by name or phone' },
+            email: { type: 'string', description: 'Filter strictly by email address' },
+            limit: { type: 'number', description: 'Maximum number of results to return' },
           },
         },
       },
       {
         name: 'hubspot_get_contact',
-        description: 'Получить полную информацию о контакте в HubSpot по его ID.',
+        description: 'Get full details of a specific contact by ID.',
         inputSchema: {
           type: 'object',
           properties: {
-            contactId: { type: 'string', description: 'ID контакта в HubSpot' },
+            contactId: { type: 'string', description: 'HubSpot Contact ID' },
           },
           required: ['contactId'],
         },
       },
       {
         name: 'hubspot_list_owners',
-        description: 'Получить список всех владельцев (пользователей) в HubSpot для назначения ответственных.',
+        description: 'Get a list of all HubSpot owners (users) to assign records.',
         inputSchema: {
           type: 'object',
           properties: {},
@@ -167,7 +167,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         content: [
           {
             type: 'text',
-            text: '❌ Ошибка: MCP-сервер не авторизован в HubSpot.\n\nПожалуйста, запустите в терминале папке проекта команду:\n`npm run login`\nУ вас откроется браузер, где нужно будет авторизовать доступ.',
+            text: '❌ Error: HubSpot MCP Server is not authenticated.\n\nPlease run the Setup Wizard in your project directory to authorize access:\n* On Windows: Double-click setup.bat\n* On macOS/Linux: Run "bash setup.sh"',
           },
         ],
         isError: true,
@@ -237,7 +237,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           content: [
             {
               type: 'text',
-              text: `✅ Сделка успешно создана!\n\n${JSON.stringify(result, null, 2)}`,
+              text: `✅ Deal created successfully!\n\n${JSON.stringify(result, null, 2)}`,
             },
           ],
         };
@@ -258,7 +258,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           content: [
             {
               type: 'text',
-              text: `✅ Сделка ${parsed.dealId} успешно обновлена!\n\n${JSON.stringify(result, null, 2)}`,
+              text: `✅ Deal ${parsed.dealId} updated successfully!\n\n${JSON.stringify(result, null, 2)}`,
             },
           ],
         };
@@ -313,14 +313,14 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       default:
-        throw new Error(`Неизвестный инструмент: ${name}`);
+        throw new Error(`Unknown tool: ${name}`);
     }
   } catch (error: any) {
     return {
       content: [
         {
           type: 'text',
-          text: `❌ Ошибка при выполнении: ${JSON.stringify(error?.response?.data || error.message || error, null, 2)}`,
+          text: `❌ Execution error: ${JSON.stringify(error?.response?.data || error.message || error, null, 2)}`,
         },
       ],
       isError: true,

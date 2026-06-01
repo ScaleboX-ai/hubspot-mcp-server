@@ -125,7 +125,7 @@ function configureCursor() {
 function getHtmlTemplate(bodyContent: string): string {
   return `
     <!DOCTYPE html>
-    <html lang="ru">
+    <html lang="en">
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -442,39 +442,39 @@ function startSetupWizard() {
             <div class="logo-icon">H</div>
             <h1>HubSpot MCP Setup</h1>
           </div>
-          <p class="subtitle">Мастер автоматической настройки Cursor и Claude Desktop</p>
+          <p class="subtitle">Automated Setup Wizard for Cursor and Claude Desktop</p>
         </div>
         
         <div class="steps">
           <div class="step-item active">
             <div class="step-num">1</div>
-            <div class="step-label">Ключи доступа</div>
+            <div class="step-label">App Keys</div>
           </div>
           <div class="step-item">
             <div class="step-num">2</div>
-            <div class="step-label">Авторизация</div>
+            <div class="step-label">Authentication</div>
           </div>
           <div class="step-item">
             <div class="step-num">3</div>
-            <div class="step-label">Готово</div>
+            <div class="step-label">Finish</div>
           </div>
         </div>
 
         <form action="/save-setup" method="POST">
           <div class="form-group">
             <label for="clientId">Client ID</label>
-            <input type="text" id="clientId" name="clientId" placeholder="Вставьте Client ID, присланный администратором" required autocomplete="off">
+            <input type="text" id="clientId" name="clientId" placeholder="Paste the Client ID provided by your administrator" required autocomplete="off">
           </div>
           <div class="form-group">
             <label for="clientSecret">Client Secret</label>
-            <input type="text" id="clientSecret" name="clientSecret" placeholder="Вставьте Client Secret, присланный администратором" required autocomplete="off">
+            <input type="text" id="clientSecret" name="clientSecret" placeholder="Paste the Client Secret provided by your administrator" required autocomplete="off">
           </div>
-          <button type="submit" class="btn">Сохранить и продолжить →</button>
+          <button type="submit" class="btn">Save & Continue →</button>
         </form>
 
         <div class="note-card">
-          <strong>ℹ️ Где взять эти ключи?</strong><br>
-          Их предоставляет администратор вашего HubSpot. Если вы настраиваете систему сами — создайте приложение в кабинете разработчика HubSpot и скопируйте ключи оттуда.
+          <strong>ℹ️ Where to get these keys?</strong><br>
+          These keys are provided by your HubSpot administrator. If you are setting up this integration yourself, create a Developer App / MCP Auth App in your HubSpot portal and copy the credentials.
         </div>
       `);
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
@@ -495,7 +495,7 @@ function startSetupWizard() {
 
         if (!clientId || !clientSecret) {
           res.writeHead(400, { 'Content-Type': 'text/html; charset=utf-8' });
-          res.end('Ключи не могут быть пустыми!');
+          res.end('Credentials cannot be empty!');
           return;
         }
 
@@ -558,9 +558,9 @@ function startSetupWizard() {
         const html = getHtmlTemplate(`
           <div class="success-checkmark" style="border-color: #ef4444; background: rgba(239, 68, 68, 0.1); color: #ef4444;">✗</div>
           <div class="success-text">
-            <h2 style="color: #ef4444;">Ошибка авторизации!</h2>
-            <p>HubSpot вернул ошибку: <strong>${error}</strong></p>
-            <a href="/setup" class="btn" style="margin-top: 20px;">Попробовать заново</a>
+            <h2 style="color: #ef4444;">Authorization Failed!</h2>
+            <p>HubSpot returned an error: <strong>${error}</strong></p>
+            <a href="/setup" class="btn" style="margin-top: 20px;">Try Again</a>
           </div>
         `);
         res.writeHead(400, { 'Content-Type': 'text/html; charset=utf-8' });
@@ -601,42 +601,42 @@ function startSetupWizard() {
             <div class="header">
               <div class="logo-wrap">
                 <div class="logo-icon" style="background: linear-gradient(135deg, var(--blue-accent), #00e5ff);">✓</div>
-                <h1>Настройка успешна!</h1>
+                <h1>Setup Complete!</h1>
               </div>
             </div>
 
             <div class="steps">
               <div class="step-item completed">
                 <div class="step-num">1</div>
-                <div class="step-label">Ключи доступа</div>
+                <div class="step-label">App Keys</div>
               </div>
               <div class="step-item completed">
                 <div class="step-num">2</div>
-                <div class="step-label">Авторизация</div>
+                <div class="step-label">Authentication</div>
               </div>
               <div class="step-item active">
                 <div class="step-num">3</div>
-                <div class="step-label">Готово</div>
+                <div class="step-label">Finish</div>
               </div>
             </div>
 
             <div class="success-checkmark">✓</div>
             
             <div class="success-text">
-              <h2>MCP Сервер успешно настроен!</h2>
-              <p>Ваши личные ключи HubSpot сохранены локально на этом компьютере. Программы Claude Desktop и Cursor настроены в фоновом режиме.</p>
+              <h2>MCP Server Configured Successfully!</h2>
+              <p>Your personal HubSpot authorization tokens have been securely saved locally. Claude Desktop and Cursor have been configured in the background.</p>
               
               <div style="background: rgba(0, 145, 174, 0.05); border: 1px solid rgba(0, 145, 174, 0.15); border-radius: 12px; padding: 20px; text-align: left; margin-bottom: 30px;">
-                <h4 style="color: var(--blue-accent); font-family: 'Outfit'; margin-bottom: 10px;">🚀 Что делать дальше?</h4>
+                <h4 style="color: var(--blue-accent); font-family: 'Outfit'; margin-bottom: 10px;">🚀 What to do next?</h4>
                 <ol style="margin-left: 20px; font-size: 13px; color: var(--text-muted); line-height: 1.6;">
-                  <li>Полностью <strong>перезапустите</strong> программы Cursor или Claude Desktop.</li>
-                  <li>В чате Claude Desktop появится значок розетки (или серая иконка молоточка в поле ввода).</li>
-                  <li>В Cursor сервер добавится автоматически на глобальном уровне! Вы увидите его в настройках.</li>
-                  <li>Просто начните новый чат с ИИ и спросите: <strong>"Найди мои сделки в HubSpot"</strong>!</li>
+                  <li>Completely <strong>restart</strong> Cursor or Claude Desktop.</li>
+                  <li>In Claude Desktop, a **plug/MCP icon** will appear in the bottom right of the chat bar.</li>
+                  <li>In Cursor, the HubSpot server is added globally! Check Cursor Settings > Features > MCP.</li>
+                  <li>Simply open a new chat with the AI and ask: <strong>"Find my deals in HubSpot"</strong>!</li>
                 </ol>
               </div>
 
-              <p style="font-size: 12px; color: var(--text-muted);">Вы можете безопасно закрыть эту вкладку браузера.</p>
+              <p style="font-size: 12px; color: var(--text-muted);">You can safely close this browser tab now.</p>
             </div>
           `);
 
@@ -644,9 +644,9 @@ function startSetupWizard() {
           res.end(html);
 
           console.log('\n======================================================');
-          console.log('🎉 УСПЕШНО: HubSpot MCP Сервер настроен через GUI!');
-          console.log('Конфигурации Claude Desktop и Cursor обновлены.');
-          console.log('Ключи сохранены в .env и .hubspot-credentials.json.');
+          console.log('🎉 SUCCESS: HubSpot MCP Server configured via GUI!');
+          console.log('Claude Desktop and Cursor settings updated.');
+          console.log('Credentials saved in .env and .hubspot-credentials.json.');
           console.log('======================================================\n');
 
           // Gracefully close server after 2 seconds
@@ -660,15 +660,15 @@ function startSetupWizard() {
           const html = getHtmlTemplate(`
             <div class="success-checkmark" style="border-color: #ef4444; background: rgba(239, 68, 68, 0.1); color: #ef4444;">✗</div>
             <div class="success-text">
-              <h2 style="color: #ef4444;">Ошибка обмена токенов!</h2>
-              <p>Не удалось получить токены доступа от HubSpot:</p>
+              <h2 style="color: #ef4444;">Token Exchange Failed!</h2>
+              <p>Could not retrieve access tokens from HubSpot:</p>
               <pre style="text-align: left; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; font-family: monospace; font-size: 11px; overflow-x: auto; max-width: 100%; color: #f3f4f6; margin-bottom: 20px;">${JSON.stringify(errMsg, null, 2)}</pre>
-              <a href="/setup" class="btn">Попробовать заново</a>
+              <a href="/setup" class="btn">Try Again</a>
             </div>
           `);
           res.writeHead(500, { 'Content-Type': 'text/html; charset=utf-8' });
           res.end(html);
-          console.error('❌ Ошибка при обмене кода авторизации:', errMsg);
+          console.error('❌ Error during OAuth code exchange:', errMsg);
         }
       }
     } else {
@@ -678,11 +678,11 @@ function startSetupWizard() {
   });
 
   server.listen(PORT, () => {
-    console.log(`\n======================================================`);
+    console.log('\n======================================================');
     console.log(`🚀 Setup Wizard Web Server started on http://localhost:${PORT}`);
-    console.log(`======================================================\n`);
-    console.log(`👉 Сейчас мы автоматически откроем мастер настройки в браузере.`);
-    console.log(`Если браузер не открылся, перейдите по ссылке вручную:`);
+    console.log('======================================================\n');
+    console.log('👉 Automatically opening setup wizard in your browser.');
+    console.log('If your browser did not open, navigate here manually:');
     console.log(`\nhttp://localhost:${PORT}/setup\n`);
 
     openBrowser(`http://localhost:${PORT}/setup`);
