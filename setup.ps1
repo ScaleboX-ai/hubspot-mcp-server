@@ -1,24 +1,27 @@
-# Инициализация путей
+# Get current directory path
 $currentDir = $PSScriptRoot
 if (-not $currentDir) { $currentDir = Get-Location }
 
-# 1. Проверка наличия Node.js
-if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
-    Write-Host "Node.js не найден. Устанавливаем Node.js в фоновом режиме..." -ForegroundColor Yellow
+# 1. Check if Node.js exists
+$nodeCheck = Get-Command "node" -ErrorAction SilentlyContinue
+if ($null -eq $nodeCheck) {
+    Write-Host "Node.js not found. Installing Node.js silently..." -ForegroundColor Yellow
     
-    # Установка через стандартный установщик Windows winget
+    # Install Node.js silently using winget
     winget install OpenJS.NodeJS.LTS --silent --accept-source-agreements --accept-package-agreements
     
-    # Обновление путей текущей сессии
+    # Refresh PATH environment variable for the current session
     $env:Path += ";C:\Program Files\nodejs"
     
-    if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
-        Write-Host "Ошибка: Не удалось автоматически установить Node.js. Пожалуйста, установите его вручную с https://nodejs.org/" -ForegroundColor Red
+    $nodeCheckAgain = Get-Command "node" -ErrorAction SilentlyContinue
+    if ($null -eq $nodeCheckAgain) {
+        Write-Host "Error: Could not automatically install Node.js. Please download and install it manually from https://nodejs.org/" -ForegroundColor Red
         Exit
     } else {
-        Write-Host "✓ Node.js успешно установлен!" -ForegroundColor Green
+        Write-Host "✓ Node.js installed successfully!" -ForegroundColor Green
     }
 }
 
-# 2. Передаем управление кроссплатформенному скрипту настройки
-node (Join-Path $currentDir "build/setup-mcp.js")
+# 2. Run the setup-mcp script
+$setupScriptPath = Join-Path $currentDir "build/setup-mcp.js"
+node $setupScriptPath
