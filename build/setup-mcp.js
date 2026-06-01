@@ -58,6 +58,8 @@ let pkceChallenge = '';
 // AI clients configuration statuses
 let claudeStatus = 'Not installed';
 let cursorStatus = 'Not installed';
+let windsurfStatus = 'Not installed';
+let clineStatus = 'Not installed';
 // Helper: SHA256 hashing
 function sha256(buffer) {
     return crypto.createHash('sha256').update(buffer).digest();
@@ -108,7 +110,6 @@ function configureClaude() {
         }
         if (!config.mcpServers)
             config.mcpServers = {};
-        // Windows JSON paths need escaping
         const escapedPath = serverPath.replace(/\\/g, '\\\\');
         config.mcpServers.hubspot = {
             command: 'node',
@@ -143,7 +144,6 @@ function configureCursor() {
         }
         if (!config.mcpServers)
             config.mcpServers = {};
-        // Windows JSON paths need escaping
         const escapedPath = serverPath.replace(/\\/g, '\\\\');
         config.mcpServers.hubspot = {
             command: 'node',
@@ -154,6 +154,86 @@ function configureCursor() {
     }
     catch (err) {
         cursorStatus = 'Failed ✗';
+    }
+}
+/**
+ * Configure Windsurf IDE config file (mcp_config.json)
+ */
+function configureWindsurf() {
+    const homedir = os.homedir();
+    const configPath = path.join(homedir, '.codeium', 'windsurf', 'mcp_config.json');
+    try {
+        const configDir = path.dirname(configPath);
+        if (!fs.existsSync(configDir)) {
+            windsurfStatus = 'Not installed';
+            return;
+        }
+        let config = {};
+        if (fs.existsSync(configPath)) {
+            try {
+                const content = fs.readFileSync(configPath, 'utf-8');
+                config = JSON.parse(content);
+            }
+            catch (e) { }
+        }
+        if (!config.mcpServers)
+            config.mcpServers = {};
+        const escapedPath = serverPath.replace(/\\/g, '\\\\');
+        config.mcpServers.hubspot = {
+            command: 'node',
+            args: [escapedPath],
+        };
+        fs.writeFileSync(configPath, JSON.stringify(config, null, 2), 'utf-8');
+        windsurfStatus = 'Successfully Configured ✓';
+    }
+    catch (err) {
+        windsurfStatus = 'Failed ✗';
+    }
+}
+/**
+ * Configure Cline VS Code extension config file (cline_mcp_settings.json)
+ */
+function configureCline() {
+    let configPath = '';
+    const homedir = os.homedir();
+    if (process.platform === 'win32') {
+        if (process.env.APPDATA) {
+            configPath = path.join(process.env.APPDATA, 'Code', 'User', 'globalStorage', 'saoudrizwan.claude-dev', 'settings', 'cline_mcp_settings.json');
+        }
+    }
+    else if (process.platform === 'darwin') {
+        configPath = path.join(homedir, 'Library', 'Application Support', 'Code', 'User', 'globalStorage', 'saoudrizwan.claude-dev', 'settings', 'cline_mcp_settings.json');
+    }
+    if (!configPath) {
+        clineStatus = 'Not supported';
+        return;
+    }
+    try {
+        const configDir = path.dirname(configPath);
+        if (!fs.existsSync(configDir)) {
+            clineStatus = 'Not installed';
+            return;
+        }
+        let config = {};
+        if (fs.existsSync(configPath)) {
+            try {
+                const content = fs.readFileSync(configPath, 'utf-8');
+                config = JSON.parse(content);
+            }
+            catch (e) { }
+        }
+        if (!config.mcpServers)
+            config.mcpServers = {};
+        const escapedPath = serverPath.replace(/\\/g, '\\\\');
+        config.mcpServers.hubspot = {
+            command: 'node',
+            args: [escapedPath],
+        };
+        fs.writeFileSync(configPath, JSON.stringify(config, null, 2), 'utf-8');
+        clineStatus = 'Successfully Configured ✓';
+    }
+    catch (err) {
+        clineStatus = 'Failed ✗';
     }
 }
 // Generate premium responsive visual GUI template
@@ -538,9 +618,11 @@ function startSetupWizard() {
                 process.env.HUBSPOT_CLIENT_ID = clientId;
                 process.env.HUBSPOT_CLIENT_SECRET = clientSecret;
                 process.env.HUBSPOT_REDIRECT_URI = REDIRECT_URI;
-                // Auto-configure Claude & Cursor paths!
+                // Auto-configure all available AI platforms!
                 configureClaude();
                 configureCursor();
+                configureWindsurf();
+                configureCline();
                 // 3. Initiate HubSpot Browser Authorization Redirect
                 // Generate secure PKCE dynamic values
                 pkceVerifier = crypto.randomBytes(32).toString('hex'); // 64 chars
@@ -610,6 +692,8 @@ function startSetupWizard() {
                     // Style the statuses of found apps
                     const claudeColor = claudeStatus.includes('✓') ? '#0091ae' : '#9ca3af';
                     const cursorColor = cursorStatus.includes('✓') ? '#0091ae' : '#9ca3af';
+                    const windsurfColor = windsurfStatus.includes('✓') ? '#0091ae' : '#9ca3af';
+                    const clineColor = clineStatus.includes('✓') ? '#0091ae' : '#9ca3af';
                     // Render absolute masterpiece visual success screen
                     const html = getHtmlTemplate(`
             <div class="header">
@@ -647,19 +731,28 @@ function startSetupWizard() {
                   <span style="color: var(--text-muted);">Claude Desktop App:</span>
                   <span style="font-weight: 600; color: ${claudeColor};">${claudeStatus}</span>
                 </div>
-                <div style="display: flex; justify-content: space-between; font-size: 13px;">
+                <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px;">
                   <span style="color: var(--text-muted);">Cursor Editor:</span>
                   <span style="font-weight: 600; color: ${cursorColor};">${cursorStatus}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px;">
+                  <span style="color: var(--text-muted);">Windsurf IDE (Cascade):</span>
+                  <span style="font-weight: 600; color: ${windsurfColor};">${windsurfStatus}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 13px;">
+                  <span style="color: var(--text-muted);">VS Code (Cline Extension):</span>
+                  <span style="font-weight: 600; color: ${clineColor};">${clineStatus}</span>
                 </div>
               </div>
 
               <div style="background: rgba(0, 145, 174, 0.05); border: 1px solid rgba(0, 145, 174, 0.15); border-radius: 12px; padding: 20px; text-align: left; margin-bottom: 30px;">
                 <h4 style="color: var(--blue-accent); font-family: 'Outfit'; margin-bottom: 10px;">🚀 What to do next?</h4>
                 <ol style="margin-left: 20px; font-size: 13px; color: var(--text-muted); line-height: 1.6;">
-                  <li>Completely <strong>restart</strong> Cursor or Claude Desktop.</li>
+                  <li>Completely <strong>restart</strong> Cursor, Claude Desktop, Windsurf, or VS Code.</li>
                   <li>In Claude Desktop, a **plug/MCP icon** will appear in the bottom right of the chat bar.</li>
+                  <li>In Windsurf, look for the **MCP icon** in the Cascade sidebar panel.</li>
                   <li>In Cursor, the HubSpot server is added globally! Check Cursor Settings > Features > MCP.</li>
-                  <li>Simply open a new chat with the AI and ask: <strong>"Find my deals in HubSpot"</strong>!</li>
+                  <li>Simply open a new chat with your AI assistant and ask: <strong>"Find my deals in HubSpot"</strong>!</li>
                 </ol>
               </div>
 
@@ -670,7 +763,7 @@ function startSetupWizard() {
                     res.end(html);
                     console.log('\n======================================================');
                     console.log('🎉 SUCCESS: HubSpot MCP Server configured via GUI!');
-                    console.log('Claude Desktop and Cursor settings updated.');
+                    console.log('Claude Desktop, Cursor, Windsurf, and VS Code settings updated.');
                     console.log('Credentials saved in .env and .hubspot-credentials.json.');
                     console.log('======================================================\n');
                     // Gracefully close server after 2 seconds
