@@ -1,0 +1,32 @@
+{
+  "name": "hubspot-mcp-server",
+  "version": "1.0.0",
+  "description": "Frictionless local HubSpot MCP Server for Cursor and Claude Desktop",
+  "main": "build/index.js",
+  "scripts": {
+    "build": "rimraf build && tsc",
+    "start": "node build/index.js",
+    "login": "ts-node src/login.ts",
+    "login:prod": "node build/login.js"
+  },
+  "keywords": [
+    "mcp",
+    "hubspot",
+    "cursor",
+    "claude"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.1",
+    "axios": "^1.7.9",
+    "dotenv": "^16.4.5",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.24",
+    "rimraf": "^5.0.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}
