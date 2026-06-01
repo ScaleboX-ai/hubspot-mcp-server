@@ -6,8 +6,8 @@
   "scripts": {
     "build": "rimraf build && tsc",
     "start": "node build/index.js",
-    "login": "ts-node src/login.ts",
-    "login:prod": "node build/login.js"
+    "setup": "ts-node src/setup-mcp.ts",
+    "setup:prod": "node build/setup-mcp.js"
   },
   "keywords": [
     "mcp",
