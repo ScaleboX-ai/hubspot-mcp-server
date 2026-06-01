@@ -6,7 +6,7 @@
 
 ## English Version
 
-This server allows your managers and sales representatives to securely connect **HubSpot CRM** to their **Cursor** or **Claude Desktop** applications using natural language. They can search contacts, view deal details, and create or update deals through their local AI assistants.
+This server allows your managers and sales representatives to securely connect **HubSpot CRM** to their **Cursor, Windsurf IDE, VS Code (Cline extension), or Claude Desktop** applications using natural language. They can search contacts, view deal details, and create or update deals through their local AI assistants.
 
 We designed this setup to be **completely frictionless and cross-platform**. Non-technical users do **not** need to install dependencies manually, edit complex JSON files, or write console commands. The installer does all the heavy lifting automatically!
 
@@ -21,9 +21,9 @@ We designed this setup to be **completely frictionless and cross-platform**. Non
     1. Double-click the **`setup.bat`** file inside the folder.
     2. A console window will pop up briefly, check for Node.js (installing it silently in the background if it's missing), and automatically launch the **Setup Wizard in your web browser**.
     3. In the browser setup form, paste the **Client ID** and **Client Secret** provided by your administrator.
-    4. Click **"Save & Continue"**. This automatically registers the server globally in your Claude Desktop and Cursor.
+    4. Click **"Save & Continue"**. This automatically registers the server globally in Claude Desktop, Cursor, Windsurf, and VS Code (Cline).
     5. You will be redirected to the HubSpot login page. Sign in under your **personal HubSpot user credentials** and click the orange **"Authorize" (Connect app)** button.
-    6. Once you see the **"Setup Complete!"** success screen with a green checkmark, you can close the browser tab.
+    6. Once you see the **"Setup Complete!"** success screen with a green checkmark showing which apps were configured, you can close the browser tab.
 
 *   **🍎 On macOS (Mac):**
     1. Open your **Terminal** application.
@@ -40,6 +40,8 @@ We designed this setup to be **completely frictionless and cross-platform**. Non
 
 *   **In Claude Desktop:** Completely restart Claude. A new **plug/MCP icon** will appear in the bottom right of the chat bar. Click it to verify `hubspot` is active.
 *   **In Cursor:** Completely restart Cursor. The HubSpot server is added globally automatically! Verify it in Settings (`Ctrl + Shift + J` or `Cmd + Shift + J` on Mac) > **Features > MCP**.
+*   **In Windsurf IDE:** Completely restart Windsurf. The server is configured globally in Cascade! Look for the **MCP icon** in the Cascade panel sidebar.
+*   **In VS Code (Cline):** Completely restart VS Code. Cline will automatically detect and load the HubSpot server tools.
 
 **Example prompts to ask your AI:**
 *   *"Find deals associated with company Acme Corp"*
@@ -50,7 +52,7 @@ We designed this setup to be **completely frictionless and cross-platform**. Non
 
 ## Русская версия
 
-Этот сервер позволяет вашим менеджерам по продажам (сейлзам) подключаться к **HubSpot** прямо через **Cursor** или **Claude Desktop** с помощью искусственного интеллекта. Они смогут искать контакты, смотреть детали, создавать и обновлять сделки простым человеческим языком.
+Этот сервер позволяет вашим менеджерам по продажам (сейлзам) подключаться к **HubSpot** прямо через **Cursor, Windsurf IDE, VS Code (расширение Cline) или Claude Desktop** с помощью искусственного интеллекта. Они смогут искать контакты, смотреть детали, создавать и обновлять сделки простым человеческим языком.
 
 Мы сделали этот продукт **абсолютно кроссплатформенным** и полностью автоматическим. Сейлзам больше **не нужно писать сложные команды, вручную настраивать JSON-файлы или искать скрытые папки**. Скрипт сделает всё за них!
 
@@ -63,7 +65,7 @@ We designed this setup to be **completely frictionless and cross-platform**. Non
 
 *   **🖥️ На Windows:**
     1. Найдите файл **`setup.bat`** внутри папки и запустите его двойным щелчком мыши.
-    2. Скрипт сам проверит Node.js (если его нет — установит в фоновом режиме), **автоматически найдет и настроит Claude Desktop и Cursor**, после чего откроет мастер настройки в браузере.
+    2. Скрипт сам проверит Node.js (если его нет — установит в фоновом режиме), **автоматически найдет и настроит Claude Desktop, Cursor, Windsurf и VS Code (Cline)**, после чего откроет мастер настройки в браузере.
     3. Вставьте **Client ID** и **Client Secret**, полученные от администратора.
     4. Нажмите **«Save & Continue»**.
     5. Войдите под своим **личным аккаунтом HubSpot** и нажмите кнопку **«Подключить приложение»** (Authorize).
@@ -75,10 +77,17 @@ We designed this setup to be **completely frictionless and cross-platform**. Non
        ```bash
        bash setup.sh
        ```
-    3. Скрипт проверит наличие Node.js (если его нет — установит), **автоматически настроит Claude Desktop и Cursor** и откроет мастер настройки в браузере.
+    3. Скрипт проверит наличие Node.js (если его нет — установит), **автоматически настроит все найденные программы** и откроет мастер настройки в браузере.
     4. Вставьте **Client ID** и **Client Secret**, полученные от администратора, и нажмите **«Save & Continue»**.
     5. Войдите под своим **личным аккаунтом HubSpot** и нажмите кнопку **«Подключить приложение»** (Authorize).
     6. Готово!
+
+#### Шаг 3. Перезапустите программы и пользуйтесь!
+
+*   **В Claude Desktop:** Перезапустите Claude. В чате появится **иконка розетки/вилки (MCP)**.
+*   **В Cursor:** Перезапустите Cursor. Сервер подключится автоматически на глобальном уровне! Проверьте в Cursor Settings > **Features > MCP**.
+*   **В Windsurf IDE:** Перезапустите Windsurf. Сервер подключится автоматически в боковой панели Cascade (иконка MCP).
+*   **В VS Code (Cline):** Перезапустите VS Code. Cline автоматически подгрузит инструменты HubSpot.
 
 ---
 
