@@ -1,40 +1,20 @@
 #!/bin/bash
-
-# Clear terminal screen
 clear
-
-echo "====================================================="
-echo "  Настройка HubSpot MCP сервера для macOS / Linux    "
-echo "====================================================="
+echo "==================================================="
+echo "  HubSpot MCP Setup Wizard"
+echo "==================================================="
 echo ""
 
-# 1. Проверка наличия Node.js
+# 1. Check if Node.js is installed
 if ! command -v node &> /dev/null
 then
-    echo "Node.js не найден. Попробуем установить..."
-    
-    if command -v brew &> /dev/null
-    then
-        echo "Устанавливаем Node.js через Homebrew..."
-        brew install node
-    else
-        echo "Homebrew не найден. Пожалуйста, скачайте и установите Node.js вручную:"
-        echo "👉 https://nodejs.org/"
-        echo ""
-        
-        # Открыть сайт в браузере на macOS
-        if [ "$(uname)" == "Darwin" ]; then
-            open "https://nodejs.org/"
-        fi
-        exit 1
+    echo "ERROR: Node.js was not found on your computer."
+    echo "Opening https://nodejs.org/ to download..."
+    if [ "$(uname)" == "Darwin" ]; then
+        open "https://nodejs.org/"
     fi
-else
-    echo "✓ Node.js уже установлен на вашем компьютере."
+    exit 1
 fi
 
-# 2. Запуск кроссплатформенного скрипта настройки
+# 2. Run setup script directly
 node "$(dirname "$0")/build/setup-mcp.js"
-
-echo ""
-echo "Нажмите Enter для выхода..."
-read
