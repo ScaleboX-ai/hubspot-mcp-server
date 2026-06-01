@@ -16,5 +16,11 @@ then
     exit 1
 fi
 
-# 2. Run setup script directly
+# 2. Install dependencies silently if node_modules is missing
+if [ ! -d "node_modules" ]; then
+    echo "Installing required libraries. Please wait..."
+    npm install --no-audit --no-fund --quiet
+fi
+
+# 3. Run setup script directly
 node "$(dirname "$0")/build/setup-mcp.js"

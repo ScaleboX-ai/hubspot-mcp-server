@@ -19,7 +19,13 @@ if %errorlevel% neq 0 (
     exit
 )
 
-:: 2. Run setup script directly using Node
+:: 2. Install dependencies silently if node_modules is missing
+if not exist node_modules (
+    echo Installing required libraries. This will take a few seconds...
+    call npm install --no-audit --no-fund --quiet
+)
+
+:: 3. Run setup script directly using Node
 node build/setup-mcp.js
 
 echo.
