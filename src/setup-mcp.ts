@@ -22,6 +22,10 @@ const serverPath = path.join(currentDir, 'build', 'index.js');
 let pkceVerifier = '';
 let pkceChallenge = '';
 
+// AI clients configuration statuses
+let claudeStatus = 'Not installed';
+let cursorStatus = 'Not installed';
+
 // Helper: SHA256 hashing
 function sha256(buffer: string): Buffer {
   return crypto.createHash('sha256').update(buffer).digest();
@@ -56,12 +60,16 @@ function configureClaude() {
     configPath = path.join(homedir, 'Library', 'Application Support', 'Claude', 'claude_desktop_config.json');
   }
 
-  if (!configPath) return;
+  if (!configPath) {
+    claudeStatus = 'Not supported';
+    return;
+  }
 
   try {
     const configDir = path.dirname(configPath);
     if (!fs.existsSync(configDir)) {
-      fs.mkdirSync(configDir, { recursive: true });
+      claudeStatus = 'Not installed';
+      return;
     }
 
     let config: any = {};
@@ -83,7 +91,10 @@ function configureClaude() {
     };
 
     fs.writeFileSync(configPath, JSON.stringify(config, null, 2), 'utf-8');
-  } catch (err) {}
+    claudeStatus = 'Successfully Configured ✓';
+  } catch (err: any) {
+    claudeStatus = 'Failed ✗';
+  }
 }
 
 /**
@@ -96,7 +107,8 @@ function configureCursor() {
   try {
     const configDir = path.dirname(configPath);
     if (!fs.existsSync(configDir)) {
-      fs.mkdirSync(configDir, { recursive: true });
+      cursorStatus = 'Not installed';
+      return;
     }
 
     let config: any = {};
@@ -118,7 +130,10 @@ function configureCursor() {
     };
 
     fs.writeFileSync(configPath, JSON.stringify(config, null, 2), 'utf-8');
-  } catch (err) {}
+    cursorStatus = 'Successfully Configured ✓';
+  } catch (err: any) {
+    cursorStatus = 'Failed ✗';
+  }
 }
 
 // Generate premium responsive visual GUI template
@@ -596,6 +611,10 @@ function startSetupWizard() {
             expiresAt: Date.now() + data.expires_in * 1000,
           });
 
+          // Style the statuses of found apps
+          const claudeColor = claudeStatus.includes('✓') ? '#0091ae' : '#9ca3af';
+          const cursorColor = cursorStatus.includes('✓') ? '#0091ae' : '#9ca3af';
+
           // Render absolute masterpiece visual success screen
           const html = getHtmlTemplate(`
             <div class="header">
@@ -624,8 +643,21 @@ function startSetupWizard() {
             
             <div class="success-text">
               <h2>MCP Server Configured Successfully!</h2>
-              <p>Your personal HubSpot authorization tokens have been securely saved locally. Claude Desktop and Cursor have been configured in the background.</p>
+              <p>Your personal HubSpot authorization tokens have been securely saved locally. Applications have been configured automatically.</p>
               
+              <!-- Premium AI App config statuses list -->
+              <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; padding: 20px; margin-bottom: 25px; text-align: left;">
+                <h4 style="font-family: 'Outfit'; font-size: 14px; margin-bottom: 12px; color: var(--text-main);">Detected AI Clients Configuration:</h4>
+                <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px;">
+                  <span style="color: var(--text-muted);">Claude Desktop App:</span>
+                  <span style="font-weight: 600; color: ${claudeColor};">${claudeStatus}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 13px;">
+                  <span style="color: var(--text-muted);">Cursor Editor:</span>
+                  <span style="font-weight: 600; color: ${cursorColor};">${cursorStatus}</span>
+                </div>
+              </div>
+
               <div style="background: rgba(0, 145, 174, 0.05); border: 1px solid rgba(0, 145, 174, 0.15); border-radius: 12px; padding: 20px; text-align: left; margin-bottom: 30px;">
                 <h4 style="color: var(--blue-accent); font-family: 'Outfit'; margin-bottom: 10px;">🚀 What to do next?</h4>
                 <ol style="margin-left: 20px; font-size: 13px; color: var(--text-muted); line-height: 1.6;">
