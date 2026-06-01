@@ -3,9 +3,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as dotenv from 'dotenv';
 
-dotenv.config();
+dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
-const CREDENTIALS_FILE = path.join(process.cwd(), '.hubspot-credentials.json');
+const CREDENTIALS_FILE = path.join(__dirname, '..', '.hubspot-credentials.json');
 
 interface Credentials {
   accessToken: string;

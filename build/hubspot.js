@@ -41,8 +41,8 @@ const axios_1 = __importDefault(require("axios"));
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
 const dotenv = __importStar(require("dotenv"));
-dotenv.config();
-const CREDENTIALS_FILE = path.join(process.cwd(), '.hubspot-credentials.json');
+dotenv.config({ path: path.join(__dirname, '..', '.env') });
+const CREDENTIALS_FILE = path.join(__dirname, '..', '.hubspot-credentials.json');
 class HubSpotClient {
     privateAppToken;
     clientId;

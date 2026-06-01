@@ -46,10 +46,10 @@ const child_process_1 = require("child_process");
 const axios_1 = __importDefault(require("axios"));
 const dotenv = __importStar(require("dotenv"));
 const hubspot_1 = require("./hubspot");
-dotenv.config();
+dotenv.config({ path: path.join(__dirname, '..', '.env') });
 const PORT = 6274;
 const REDIRECT_URI = `http://localhost:${PORT}/oauth/callback/debug`;
-const currentDir = process.cwd();
+const currentDir = path.join(__dirname, '..');
 const envPath = path.join(currentDir, '.env');
 const serverPath = path.join(currentDir, 'build', 'index.js');
 // PKCE temporary values
