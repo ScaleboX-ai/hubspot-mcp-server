@@ -52,6 +52,7 @@ const REDIRECT_URI = `http://localhost:${PORT}/oauth/callback/debug`;
 const currentDir = path.join(__dirname, '..');
 const envPath = path.join(currentDir, '.env');
 const serverPath = path.join(currentDir, 'build', 'index.js');
+const credentialsPath = path.join(currentDir, '.hubspot-credentials.json');
 // PKCE temporary values
 let pkceVerifier = '';
 let pkceChallenge = '';
@@ -694,6 +695,9 @@ function startSetupWizard() {
                     const cursorColor = cursorStatus.includes('✓') ? '#0091ae' : '#9ca3af';
                     const windsurfColor = windsurfStatus.includes('✓') ? '#0091ae' : '#9ca3af';
                     const clineColor = clineStatus.includes('✓') ? '#0091ae' : '#9ca3af';
+                    // Format paths for copy-paste AI prompt
+                    const escapedPath = serverPath.replace(/\\/g, '\\\\');
+                    const escapedCredentialsPath = credentialsPath.replace(/\\/g, '\\\\');
                     // Render absolute masterpiece visual success screen
                     const html = getHtmlTemplate(`
             <div class="header">
@@ -745,6 +749,24 @@ function startSetupWizard() {
                 </div>
               </div>
 
+              <!-- AI Self-Configuration copy-paste prompt card -->
+              <div style="background: rgba(255, 255, 255, 0.02); border: 1px dashed rgba(255, 255, 255, 0.15); border-radius: 12px; padding: 20px; margin-bottom: 25px; text-align: left;">
+                <h4 style="font-family: 'Outfit'; font-size: 14px; margin-bottom: 8px; color: var(--text-main);">Using a different AI client? (AI Self-Configuration)</h4>
+                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.5;">
+                  If your AI editor/app (e.g., Copilot, Continue, double.bot, LibreChat) is not listed above, copy the prompt below and paste it directly into your AI assistant chat. The AI will read your local paths and automatically configure the HubSpot MCP server for itself!
+                </p>
+                
+                <div style="position: relative;">
+                  <textarea id="aiPrompt" readonly style="width: 100%; height: 110px; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; font-family: monospace; font-size: 11px; color: #a5b4fc; resize: none; outline: none; line-height: 1.5; box-sizing: border-box;">Please configure the local HubSpot MCP server for my environment. Here are the configuration details you need:
+- Command: node
+- Arguments: ["${escapedPath}"]
+- Credentials file: "${escapedCredentialsPath}"
+
+Please locate my client/extension configuration file on my computer and automatically register this stdio MCP server under the name 'hubspot'.</textarea>
+                  <button onclick="copyPrompt()" style="margin-top: 8px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: #fff; padding: 8px 12px; border-radius: 6px; font-size: 11px; cursor: pointer; transition: all 0.2s; font-weight: 500; width: 100%;">Copy Prompt to Clipboard</button>
+                </div>
+              </div>
+
               <div style="background: rgba(0, 145, 174, 0.05); border: 1px solid rgba(0, 145, 174, 0.15); border-radius: 12px; padding: 20px; text-align: left; margin-bottom: 30px;">
                 <h4 style="color: var(--blue-accent); font-family: 'Outfit'; margin-bottom: 10px;">🚀 What to do next?</h4>
                 <ol style="margin-left: 20px; font-size: 13px; color: var(--text-muted); line-height: 1.6;">
@@ -758,6 +780,16 @@ function startSetupWizard() {
 
               <p style="font-size: 12px; color: var(--text-muted);">You can safely close this browser tab now.</p>
             </div>
+
+            <script>
+              function copyPrompt() {
+                const copyText = document.getElementById("aiPrompt");
+                copyText.select();
+                copyText.setSelectionRange(0, 99999);
+                navigator.clipboard.writeText(copyText.value);
+                alert("AI configuration prompt copied to clipboard! Paste it into your AI assistant chat.");
+              }
+            </script>
           `);
                     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
                     res.end(html);
