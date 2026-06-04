@@ -2,10 +2,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const index_js_1 = require("@modelcontextprotocol/sdk/server/index.js");
 const stdio_js_1 = require("@modelcontextprotocol/sdk/server/stdio.js");
+const index_js_2 = require("@modelcontextprotocol/sdk/client/index.js");
+const streamableHttp_js_1 = require("@modelcontextprotocol/sdk/client/streamableHttp.js");
 const types_js_1 = require("@modelcontextprotocol/sdk/types.js");
-const zod_1 = require("zod");
 const hubspot_1 = require("./hubspot");
-const client = new hubspot_1.HubSpotClient();
+const hubspot = new hubspot_1.HubSpotClient();
+let remoteClient = null;
+let transport = null;
+let lastUsedToken = null;
 const server = new index_js_1.Server({
     name: 'hubspot-mcp-server',
     version: '1.0.0',
@@ -14,141 +18,83 @@ const server = new index_js_1.Server({
         tools: {},
     },
 });
-// Define schema validation for tools
-const SearchDealsSchema = zod_1.z.object({
-    query: zod_1.z.string().optional(),
-    dealstage: zod_1.z.string().optional(),
-    minAmount: zod_1.z.number().optional(),
-    limit: zod_1.z.number().optional().default(10),
-});
-const GetDealSchema = zod_1.z.object({
-    dealId: zod_1.z.string(),
-});
-const CreateDealSchema = zod_1.z.object({
-    dealname: zod_1.z.string(),
-    dealstage: zod_1.z.string(),
-    amount: zod_1.z.union([zod_1.z.number(), zod_1.z.string()]).optional(),
-    closedate: zod_1.z.string().optional(),
-    hubspot_owner_id: zod_1.z.string().optional(),
-});
-const UpdateDealSchema = zod_1.z.object({
-    dealId: zod_1.z.string(),
-    dealname: zod_1.z.string().optional(),
-    dealstage: zod_1.z.string().optional(),
-    amount: zod_1.z.union([zod_1.z.number(), zod_1.z.string()]).optional(),
-    closedate: zod_1.z.string().optional(),
-    hubspot_owner_id: zod_1.z.string().optional(),
-});
-const SearchContactsSchema = zod_1.z.object({
-    query: zod_1.z.string().optional(),
-    email: zod_1.z.string().optional(),
-    limit: zod_1.z.number().optional().default(10),
-});
-const GetContactSchema = zod_1.z.object({
-    contactId: zod_1.z.string(),
+/**
+ * Lazy initializer for remote client connection to mcp.hubspot.com.
+ * Handles automatic token refreshing by re-establishing connection if token changes.
+ */
+async function getRemoteClient() {
+    const isAuth = await hubspot.isAuthenticated();
+    if (!isAuth) {
+        throw new Error('NOT_AUTHENTICATED');
+    }
+    const currentToken = await hubspot.getAuthHeader();
+    // If connection exists and token hasn't changed, reuse the connection
+    if (remoteClient && lastUsedToken === currentToken) {
+        return remoteClient;
+    }
+    // If token changed (due to refresh), close existing connection and recreate
+    if (remoteClient) {
+        console.error('Re-establishing remote HubSpot connection due to token refresh...');
+        try {
+            await remoteClient.close();
+        }
+        catch (e) { }
+        remoteClient = null;
+    }
+    lastUsedToken = currentToken;
+    transport = new streamableHttp_js_1.StreamableHTTPClientTransport(new URL('https://mcp.hubspot.com/'), {
+        requestInit: {
+            headers: {
+                Authorization: currentToken,
+            },
+        },
+    });
+    const clientInstance = new index_js_2.Client({ name: 'hubspot-mcp-proxy-client', version: '1.0.0' }, { capabilities: {} });
+    await clientInstance.connect(transport);
+    remoteClient = clientInstance;
+    return remoteClient;
+}
+// Cleanup remote client connection on process exit
+process.on('exit', () => {
+    if (remoteClient) {
+        remoteClient.close().catch(() => { });
+    }
 });
 /**
- * Register available tools
+ * Handle List Tools Request - Fetch dynamically from remote HubSpot MCP server
  */
 server.setRequestHandler(types_js_1.ListToolsRequestSchema, async () => {
-    return {
-        tools: [
-            {
-                name: 'hubspot_search_deals',
-                description: 'Search for deals in HubSpot by text query, dealstage, or minimum amount.',
-                inputSchema: {
-                    type: 'object',
-                    properties: {
-                        query: { type: 'string', description: 'Text query to search by deal name' },
-                        dealstage: { type: 'string', description: 'Deal stage (e.g. appointmentscheduled, closedwon, closedlost)' },
-                        minAmount: { type: 'number', description: 'Minimum deal amount' },
-                        limit: { type: 'number', description: 'Maximum number of results to return (default 10)' },
-                    },
-                },
-            },
-            {
-                name: 'hubspot_get_deal',
-                description: 'Get full details of a specific HubSpot deal by ID.',
-                inputSchema: {
-                    type: 'object',
-                    properties: {
-                        dealId: { type: 'string', description: 'Unique HubSpot Deal ID' },
-                    },
-                    required: ['dealId'],
-                },
-            },
-            {
-                name: 'hubspot_create_deal',
-                description: 'Create a new deal in HubSpot.',
-                inputSchema: {
-                    type: 'object',
-                    properties: {
-                        dealname: { type: 'string', description: 'Deal Name' },
-                        dealstage: { type: 'string', description: 'Deal stage (e.g. appointmentscheduled, qualifiedtobuy, presentationscheduled, decisionmakerboughtin, contractsent, closedwon, closedlost)' },
-                        amount: { type: 'number', description: 'Deal Amount' },
-                        closedate: { type: 'string', description: 'Expected Close Date (format YYYY-MM-DD or ISO)' },
-                        hubspot_owner_id: { type: 'string', description: 'Owner ID (HubSpot User ID) responsible for the deal' },
-                    },
-                    required: ['dealname', 'dealstage'],
-                },
-            },
-            {
-                name: 'hubspot_update_deal',
-                description: 'Update properties of an existing HubSpot deal.',
-                inputSchema: {
-                    type: 'object',
-                    properties: {
-                        dealId: { type: 'string', description: 'ID of the deal to update' },
-                        dealname: { type: 'string', description: 'New deal name (optional)' },
-                        dealstage: { type: 'string', description: 'New deal stage (optional)' },
-                        amount: { type: 'number', description: 'New deal amount (optional)' },
-                        closedate: { type: 'string', description: 'New close date (optional)' },
-                        hubspot_owner_id: { type: 'string', description: 'New owner ID (optional)' },
-                    },
-                    required: ['dealId'],
-                },
-            },
-            {
-                name: 'hubspot_search_contacts',
-                description: 'Search for contacts in HubSpot by name, email, phone, or company.',
-                inputSchema: {
-                    type: 'object',
-                    properties: {
-                        query: { type: 'string', description: 'Text query to search by name or phone' },
-                        email: { type: 'string', description: 'Filter strictly by email address' },
-                        limit: { type: 'number', description: 'Maximum number of results to return' },
-                    },
-                },
-            },
-            {
-                name: 'hubspot_get_contact',
-                description: 'Get full details of a specific contact by ID.',
-                inputSchema: {
-                    type: 'object',
-                    properties: {
-                        contactId: { type: 'string', description: 'HubSpot Contact ID' },
-                    },
-                    required: ['contactId'],
-                },
-            },
-            {
-                name: 'hubspot_list_owners',
-                description: 'Get a list of all HubSpot owners (users) to assign records.',
-                inputSchema: {
-                    type: 'object',
-                    properties: {},
-                },
-            },
-        ],
-    };
+    try {
+        const rc = await getRemoteClient();
+        return await rc.listTools();
+    }
+    catch (error) {
+        if (error.message === 'NOT_AUTHENTICATED') {
+            return {
+                tools: [],
+                _meta: {
+                    error: 'HubSpot MCP Server is not authenticated. Please run the Setup Wizard first.'
+                }
+            };
+        }
+        console.error('Error listing tools from remote HubSpot server:', error);
+        throw error;
+    }
 });
 /**
- * Handle tool executions
+ * Handle Call Tool Request - Proxy the tool execution to remote HubSpot MCP server
  */
 server.setRequestHandler(types_js_1.CallToolRequestSchema, async (request) => {
     try {
-        const isAuth = await client.isAuthenticated();
-        if (!isAuth) {
+        const rc = await getRemoteClient();
+        const { name, arguments: args } = request.params;
+        return await rc.callTool({
+            name,
+            arguments: args,
+        });
+    }
+    catch (error) {
+        if (error.message === 'NOT_AUTHENTICATED') {
             return {
                 content: [
                     {
@@ -159,145 +105,12 @@ server.setRequestHandler(types_js_1.CallToolRequestSchema, async (request) => {
                 isError: true,
             };
         }
-        const { name, arguments: args } = request.params;
-        switch (name) {
-            case 'hubspot_search_deals': {
-                const parsed = SearchDealsSchema.parse(args);
-                const filters = [];
-                if (parsed.dealstage) {
-                    filters.push({
-                        propertyName: 'dealstage',
-                        operator: 'EQ',
-                        value: parsed.dealstage,
-                    });
-                }
-                if (parsed.minAmount) {
-                    filters.push({
-                        propertyName: 'amount',
-                        operator: 'GTE',
-                        value: String(parsed.minAmount),
-                    });
-                }
-                const result = await client.searchObjects('deals', parsed.query, filters, undefined, parsed.limit);
-                return {
-                    content: [
-                        {
-                            type: 'text',
-                            text: JSON.stringify(result, null, 2),
-                        },
-                    ],
-                };
-            }
-            case 'hubspot_get_deal': {
-                const parsed = GetDealSchema.parse(args);
-                const result = await client.getObject('deals', parsed.dealId, undefined, ['contacts', 'companies']);
-                return {
-                    content: [
-                        {
-                            type: 'text',
-                            text: JSON.stringify(result, null, 2),
-                        },
-                    ],
-                };
-            }
-            case 'hubspot_create_deal': {
-                const parsed = CreateDealSchema.parse(args);
-                const properties = {
-                    dealname: parsed.dealname,
-                    dealstage: parsed.dealstage,
-                };
-                if (parsed.amount !== undefined)
-                    properties.amount = String(parsed.amount);
-                if (parsed.closedate)
-                    properties.closedate = parsed.closedate;
-                if (parsed.hubspot_owner_id)
-                    properties.hubspot_owner_id = parsed.hubspot_owner_id;
-                const result = await client.createObject('deals', properties);
-                return {
-                    content: [
-                        {
-                            type: 'text',
-                            text: `✅ Deal created successfully!\n\n${JSON.stringify(result, null, 2)}`,
-                        },
-                    ],
-                };
-            }
-            case 'hubspot_update_deal': {
-                const parsed = UpdateDealSchema.parse(args);
-                const properties = {};
-                if (parsed.dealname !== undefined)
-                    properties.dealname = parsed.dealname;
-                if (parsed.dealstage !== undefined)
-                    properties.dealstage = parsed.dealstage;
-                if (parsed.amount !== undefined)
-                    properties.amount = parsed.amount === null ? null : String(parsed.amount);
-                if (parsed.closedate !== undefined)
-                    properties.closedate = parsed.closedate;
-                if (parsed.hubspot_owner_id !== undefined)
-                    properties.hubspot_owner_id = parsed.hubspot_owner_id;
-                const result = await client.updateObject('deals', parsed.dealId, properties);
-                return {
-                    content: [
-                        {
-                            type: 'text',
-                            text: `✅ Deal ${parsed.dealId} updated successfully!\n\n${JSON.stringify(result, null, 2)}`,
-                        },
-                    ],
-                };
-            }
-            case 'hubspot_search_contacts': {
-                const parsed = SearchContactsSchema.parse(args);
-                const filters = [];
-                if (parsed.email) {
-                    filters.push({
-                        propertyName: 'email',
-                        operator: 'EQ',
-                        value: parsed.email,
-                    });
-                }
-                const result = await client.searchObjects('contacts', parsed.query, filters, undefined, parsed.limit);
-                return {
-                    content: [
-                        {
-                            type: 'text',
-                            text: JSON.stringify(result, null, 2),
-                        },
-                    ],
-                };
-            }
-            case 'hubspot_get_contact': {
-                const parsed = GetContactSchema.parse(args);
-                const result = await client.getObject('contacts', parsed.contactId, undefined, ['deals']);
-                return {
-                    content: [
-                        {
-                            type: 'text',
-                            text: JSON.stringify(result, null, 2),
-                        },
-                    ],
-                };
-            }
-            case 'hubspot_list_owners': {
-                const result = await client.listOwners();
-                return {
-                    content: [
-                        {
-                            type: 'text',
-                            text: JSON.stringify(result, null, 2),
-                        },
-                    ],
-                };
-            }
-            default:
-                throw new Error(`Unknown tool: ${name}`);
-        }
-    }
-    catch (error) {
+        console.error(`Error executing remote tool ${request.params.name}:`, error);
         return {
             content: [
                 {
                     type: 'text',
-                    text: `❌ Execution error: ${JSON.stringify(error?.response?.data || error.message || error, null, 2)}`,
+                    text: `❌ Proxy execution error: ${error.message || JSON.stringify(error)}`,
                 },
             ],
             isError: true,
@@ -308,8 +121,8 @@ server.setRequestHandler(types_js_1.CallToolRequestSchema, async (request) => {
  * Start the Stdio Server
  */
 async function main() {
-    const transport = new stdio_js_1.StdioServerTransport();
-    await server.connect(transport);
+    const stdioTransport = new stdio_js_1.StdioServerTransport();
+    await server.connect(stdioTransport);
     console.error('HubSpot MCP Server running on stdio');
 }
 main().catch((error) => {
